@@ -27,21 +27,25 @@ Se usan dos redes para aislar la base de datos: Prometheus y Grafana no pueden l
 user-crud-monitoring/
 ├── docker-compose.yml
 ├── Dockerfile
+├── seed.py
+├── Practica_1_Docker_Guide.pdf
 ├── README.md
 ├── app/
 │   ├── main.py
-│   ├── database.py
-│   ├── models.py
-│   └── requirements.txt
-├── prometheus/
-│   └── prometheus.yml
-└── grafana/
-    └── provisioning/
-        ├── datasources/
-        │   └── datasource.yml
-        └── dashboards/
-            ├── dashboards.yml
-            └── *.json
+│   ├── requirements.txt
+│   └── app/
+│       ├── database.py
+│       └── models.py
+├── grafana/
+│   ├── Dashboard_Grafana.json
+│   ├── Dashboard_2.json
+│   └── provisioning/
+│       ├── dashboards/
+│       │   └── dashboards.yml
+│       └── datasources/
+│           └── datasource.yml
+└── prometheus/
+    └── prometheus.yml
 ```
 
 ## Requisitos
@@ -88,10 +92,10 @@ curl.exe -X GET "http://localhost:8000/users"
 curl.exe http://localhost:8000/metrics | findstr user_created
 ```
 
-Crear 10 usuarios automáticamente:
+Crear varios usuarios automáticamente con el script incluido (requiere `pip install requests`):
 
-```powershell
-1..10 | ForEach-Object { curl.exe -s -X POST "http://localhost:8000/users?name=User$_&age=$(20+$_)"; Start-Sleep -Seconds 1 }
+```bash
+python seed.py
 ```
 
 Verificar en la base de datos:
@@ -127,15 +131,12 @@ Nota: `user_created_total` vive en memoria. Si se reinicia el contenedor `fastap
 - Usuario: `admin` / Contraseña: `admin`
 - Fuente de datos: Prometheus (`http://prometheus:9090`)
 
-Dashboards incluidos:
+Dashboards exportados como JSON en la carpeta `grafana/`:
 
-- App Usuarios creados
-- APP-RAM
-- Archivos y conexiones abiertas
-- CPU-SEC
-- Tiempo-Funcionamiento
+- `Dashboard_Grafana.json`
+- `Dashboard_2.json`
 
-Los dashboards se exportan como JSON (**Export → Export as code**) y se guardan en `grafana/provisioning/dashboards/` para que Grafana los cargue al arrancar.
+Para importarlos: **Dashboards → New → Import → Upload dashboard JSON file**. Si se copian a `grafana/provisioning/dashboards/`, Grafana los carga solo al arrancar.
 
 ## Ejecución manual (sin Compose)
 
